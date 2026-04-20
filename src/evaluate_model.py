@@ -16,6 +16,7 @@ def evaluate_model(model, X_test, y_test):
         y_prob = model.predict_proba(X_test)[:, 1]
         roc_auc = roc_auc_score(y_test, y_prob)
     else:
+        y_prob = None
         roc_auc = None
 
     results = {

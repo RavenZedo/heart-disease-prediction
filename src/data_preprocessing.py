@@ -10,10 +10,9 @@ def load_data(path="data/raw/heart.csv"):
 
 
 def preprocess_data(df):
-    # remove duplicates
     df = df.drop_duplicates().copy()
 
-    # fill missing values if any
+    # Handle missing values
     for col in df.columns:
         if df[col].isnull().sum() > 0:
             if df[col].dtype == "object":
@@ -21,7 +20,13 @@ def preprocess_data(df):
             else:
                 df[col] = df[col].fillna(df[col].median())
 
-    # target column assumption
+    # Outlier handling using simple threshold filtering
+    if "chol" in df.columns:
+        df = df[df["chol"] < 500]
+
+    if "trestbps" in df.columns:
+        df = df[df["trestbps"] < 200]
+
     target_col = "target"
     if target_col not in df.columns:
         raise ValueError("Target column 'target' not found in dataset.")
@@ -34,7 +39,10 @@ def preprocess_data(df):
 
 def split_and_scale(X, y, test_size=0.2, random_state=42):
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state, stratify=y
+        X, y,
+        test_size=test_size,
+        random_state=random_state,
+        stratify=y
     )
 
     scaler = StandardScaler()
